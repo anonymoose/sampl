@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
+
+var config Config
 
 func main() {
-	fmt.Printf("Hello, world.\n")
+	config := parseConfig()
+
+	fmt.Printf(config.ListenAddr)
 }
