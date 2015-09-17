@@ -25,5 +25,5 @@ func httpStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func serverStatus() string {
-	return "Status:  OK"
+	return "Status: OK"
 }
