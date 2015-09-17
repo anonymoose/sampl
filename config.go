@@ -1,3 +1,7 @@
+// Copyright 2015 Palm Valley Data Lab. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package main
 
 import (
@@ -10,6 +14,8 @@ import (
 const DEFAULT_CONFIG_FILE = "./sampl.conf"
 const DEFAULT_LISTEN_ADDR = "127.0.0.1"
 const DEFAULT_LISTEN_PORT = "5151"
+const DEFAULT_CLIENT_ADDR = "127.0.0.1"
+const DEFAULT_CLIENT_PORT = "5152"
 
 func chkerr(e error) {
 	if e != nil {
@@ -32,6 +38,9 @@ func initCommandLine() *CmdLine {
 
 // Runtime configuration
 type Config struct {
+	ClientAddr string `yaml:"client_addr"`
+	ClientPort string `yaml:"client_port"`
+
 	ListenAddr string `yaml:"listen_addr"`
 	ListenPort string `yaml:"listen_port"`
 }
@@ -46,5 +55,14 @@ func parseConfig() *Config {
 	err := yaml.Unmarshal(fileContents, &conf)
 	chkerr(err)
 
+	checkConfig(&conf)
+
 	return &conf
+}
+
+// Ensure that rules are followed for configuration files.
+func checkConfig(conf *Config) {
+	if conf.ClientPort == conf.ListenPort {
+		log.Fatalf("CONFIG FILE ERROR: client_port can not be the same as listen_port")
+	}
 }
