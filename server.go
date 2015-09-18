@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	//"net/url"
 	"strings"
 )
 
@@ -16,6 +15,7 @@ import (
 // Launch an HTTP server listening on the rpc listen port
 //
 func launchHttpServer(conf *Config) {
+	http.HandleFunc("/status", httpStatus)
 	http.HandleFunc("/status/", httpStatus)
 	http.HandleFunc("/write/", httpWrite)
 
@@ -37,6 +37,10 @@ func httpStatus(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, out)
 }
 
+//
+// Testable wrapper around dbStatus.  None of this stuff is net/http specific.  All the
+// URL mapping cruft is eliminated.
+//
 func httpStatusImpl(path string, params *[]string, postData *map[string][]string) string {
 	return dbStatus()
 }
