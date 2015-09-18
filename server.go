@@ -79,7 +79,7 @@ func httpParseRequest(r *http.Request) (string, *map[string]string, *map[string]
 //   data = {derf: fud, fuzz: twist}
 //
 // Examples
-
+//
 //
 func httpWrite(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s: /write \n", r.RemoteAddr)
