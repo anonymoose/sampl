@@ -73,6 +73,12 @@ func dbStatus() string {
 //
 // Take an write instruction and save it to file.
 //
-func dbWrite(database string, collection string, params *[]string, foo *map[string][]string) string {
+func dbWrite(database string, collection string, params *map[string]string, foo *map[string][]string) string {
+	command := &Command{
+		commandType:  COMMAND_WRITE,
+		database:     database,
+		collection:   collection,
+		instructions: params,
+	}
 	return "Write: OK"
 }

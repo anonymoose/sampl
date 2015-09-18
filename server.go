@@ -30,7 +30,7 @@ func launchHttpServer(conf *Config) {
 func httpStatus(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s: /status \n", r.RemoteAddr)
 	var path string
-	var params *[]string
+	var params *map[string]string
 	var data *map[string][]string
 	path, params, data = httpParseRequest(r)
 	out := httpStatusImpl(path, params, data)
@@ -41,19 +41,27 @@ func httpStatus(w http.ResponseWriter, r *http.Request) {
 // Testable wrapper around dbStatus.  None of this stuff is net/http specific.  All the
 // URL mapping cruft is eliminated.
 //
-func httpStatusImpl(path string, params *[]string, postData *map[string][]string) string {
+func httpStatusImpl(path string, params *map[string]string, postData *map[string][]string) string {
 	return dbStatus()
 }
 
 //
 // Parse the HTTP request object into constituent parts we care about.
 //
-func httpParseRequest(r *http.Request) (string, *[]string, *map[string][]string) {
+func httpParseRequest(r *http.Request) (string, *map[string]string, *map[string][]string) {
 	path := r.URL.Path[len("/write/"):]
 	query := r.URL.RawQuery
-	var params []string
+	params := make(map[string]string)
 	if query != "" {
-		params = strings.Split(query, "&")
+		paramPairs := strings.Split(query, "&")
+		for i := 0; i < len(paramPairs); i++ {
+			kv := strings.Split(paramPairs[i], "=")
+			if len(kv) == 2 {
+				params[kv[0]] = kv[0]
+			} else {
+				/* TODO: KB: [2015-09-18]: Warn about invalid parameter */
+			}
+		}
 	}
 	data := (map[string][]string)(r.PostForm)
 	return path, &params, &data
@@ -62,6 +70,7 @@ func httpParseRequest(r *http.Request) (string, *[]string, *map[string][]string)
 //
 // Wrapper around HTTP call to write data.
 //
+// curl --data "derf=fud&fuzz=twist" "https://localhost:5152/write/foo/bar?a=b&c=d"
 // POST /write/foo/bar?a=b&c=d
 //       DATA derf=fud&fuzz=twist
 //   database = foo
@@ -69,12 +78,15 @@ func httpParseRequest(r *http.Request) (string, *[]string, *map[string][]string)
 //   params {a: b, c: d}
 //   data = {derf: fud, fuzz: twist}
 //
+// Examples
+
+//
 func httpWrite(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s: /write \n", r.RemoteAddr)
 
 	if "POST" == r.Method {
 		var path string
-		var params *[]string
+		var params *map[string]string
 		var data *map[string][]string
 		path, params, data = httpParseRequest(r)
 		out := httpWriteImpl(path, params, data)
@@ -89,7 +101,7 @@ func httpWrite(w http.ResponseWriter, r *http.Request) {
 // Testable wrapper around dbWrite.  None of this stuff is net/http specific.  All the
 // URL mapping cruft is eliminated.
 //
-func httpWriteImpl(path string, params *[]string, postData *map[string][]string) string {
+func httpWriteImpl(path string, params *map[string]string, postData *map[string][]string) string {
 	parts := strings.Split(path, "/")
 	return dbWrite(parts[0], parts[1], params, postData)
 }
