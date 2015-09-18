@@ -10,6 +10,12 @@ import (
 )
 
 func Test_serverStatus(t *testing.T) {
-	statusMsg := serverStatus()
+	statusMsg := httpStatusImpl("", nil, nil)
 	assert.Equal(t, "Status: OK", statusMsg)
+
+}
+
+func Test_writeImpl(t *testing.T) {
+	writeMsg := httpWriteImpl("foo/bar", nil, nil)
+	assert.Equal(t, "Write: OK", writeMsg)
 }

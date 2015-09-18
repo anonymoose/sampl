@@ -12,17 +12,12 @@ import (
 )
 
 const DEFAULT_CONFIG_FILE = "./sampl.conf"
+
 const DEFAULT_LISTEN_ADDR = "127.0.0.1"
 const DEFAULT_LISTEN_PORT = "5151"
 const DEFAULT_CLIENT_ADDR = "127.0.0.1"
 const DEFAULT_CLIENT_PORT = "5152"
-
-func chkerr(e error) {
-	if e != nil {
-		log.Fatalf("error: %v", e)
-		panic(e)
-	}
-}
+const DEFAULT_DATA_DIR = "./data"
 
 // Command line argument parsing.
 type CmdLine struct {
@@ -43,9 +38,13 @@ type Config struct {
 
 	ListenAddr string `yaml:"listen_addr"`
 	ListenPort string `yaml:"listen_port"`
+
+	DataDir string `yaml:"data_dir"`
 }
 
+//
 // Parse the config file specified on the command line into a structure for passing around later.
+//
 func parseConfig() *Config {
 	cmd := initCommandLine()
 	fileContents, e := ioutil.ReadFile(cmd.configFile)
@@ -60,7 +59,9 @@ func parseConfig() *Config {
 	return &conf
 }
 
+//
 // Ensure that rules are followed for configuration files.
+//
 func checkConfig(conf *Config) {
 	if conf.ClientPort == conf.ListenPort {
 		log.Fatalf("CONFIG FILE ERROR: client_port can not be the same as listen_port")

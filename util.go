@@ -5,19 +5,12 @@
 package main
 
 import (
-	"fmt"
+	"log"
 )
 
-var config Config
-
-func main() {
-	config := parseConfig()
-
-	ensureEnvironment(config)
-
-	launchDbHandlerPool(config)
-
-	launchHttpServer(config)
-
-	fmt.Printf(config.ListenAddr)
+func chkerr(e error) {
+	if e != nil {
+		log.Fatalf("error: %v", e)
+		panic(e)
+	}
 }

@@ -9,6 +9,9 @@ Yaml:
 
 go get -v -u gopkg.in/yaml.v2
 
+Gringo queueing library:
+
+go get -v -u github.com/textnode/gringo
 
 ## Copyright
 
